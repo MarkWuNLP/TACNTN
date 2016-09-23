@@ -7,6 +7,7 @@ from logistic_sgd import LogisticRegression
 from CNN import QALeNetConvPoolLayer
 from Classifier import BilinearLR, MLP, TensorClassifier
 from Optimization import  Adam
+from numpy.random import shuffle
 import theano.tensor as T
 
 def get_idx_from_sent(sent, word_idx_map, max_l=50, filter_h=3):
@@ -51,11 +52,8 @@ def train_cnn(datasets,
         filter_hs=[3],           # filter width
         hidden_units=[100,2],
         shuffle_batch=True,
-        n_epochs=25,
-        lam=0,
-        batch_size=20,
-        lr_decay = 0.95,          # for AdaDelta
-        sqr_norm_lim=9):          # for optimization
+        n_epochs=10,
+        batch_size=20,tensordim = 8):          # for optimization
     """
     return: a list of dicts of lists, each list contains (ansId, groundTruth, prediction) for a question
     """
@@ -77,9 +75,7 @@ def train_cnn(datasets,
     print pool_sizes
 
     parameters = [("image shape",img_h,img_w), ("filter shape",filter_shapes),
-                  ("hidden_units",hidden_units), ("batch_size",batch_size),
-                  ("lambda",lam), ("learn_decay",lr_decay),
-                  ("sqr_norm_lim",sqr_norm_lim), ("shuffle_batch",shuffle_batch)]
+                  ("hidden_units",hidden_units), ("batch_size",batch_size), ("shuffle_batch",shuffle_batch)]
     print parameters
 
     index = T.lscalar()
@@ -94,9 +90,6 @@ def train_cnn(datasets,
 
     session_topic = TWords[t]
     res_topic = TWords[t2]
-
-    # session_topic = Words[T.cast(session_topic.flatten(),dtype="int32")].reshape((lx.shape[0],20,Words.shape[1]))
-    # res_topic = Words[T.cast(res_topic.flatten(),dtype="int32")].reshape((lx.shape[0],20,Words.shape[1]))
 
     llayer0_input = Words[T.cast(lx.flatten(),dtype="int32")].reshape((lx.shape[0],lx.shape[1],Words.shape[1]))     # input: word embeddings of the mini batch
     rlayer0_input = Words[T.cast(rx.flatten(),dtype="int32")].reshape((rx.shape[0],rx.shape[1],Words.shape[1]))     # input: word embeddings of the mini batch
@@ -175,14 +168,9 @@ def train_cnn(datasets,
     print test(1).shape
     print test(1)
 
-
-    tensordim = 8
-
     tmp1 = TensorClassifier(rng,50,50,dim_tensor=tensordim)
     tmp2 = TensorClassifier(rng,100,50,dim_tensor=tensordim)
 
-    #topic_vector = _dropout_from_layer(rng,topic_vector,0.2)
-    #response_vector = _dropout_from_layer(rng,response_vector,0.2)
 
     output_1 = tmp1(llayer1_input,rlayer1_input,batch_size=batch_size)
     output_2 = tmp2(response_vector,llayer1_input,batch_size=batch_size)
@@ -224,7 +212,7 @@ def train_cnn(datasets,
     },on_unused_input='ignore')
     best_dev = 1.
     n_train_batches = datasets[0].shape[0]/batch_size
-    for i in xrange(5):
+    for i in xrange(n_epochs):
         cost = 0
         total = 0.
         for minibatch_index in np.random.permutation(range(n_train_batches)):
@@ -233,9 +221,10 @@ def train_cnn(datasets,
             total = total + 1
             cost = cost + batch_cost
             if total % 50 == 0:
-                print total, cost/total, batch_cost
+                print "batch number:",total,"average cost:", cost/total,\
+                    "the batch cost:",batch_cost
         cost = cost / n_train_batches
-        print "echo %d loss %f" % (i,cost)
+        print "training echo %d loss %f" % (i,cost)
 
         cost=0
         errors = 0
@@ -469,12 +458,12 @@ def ComputeSame(m,r):
     #print total
     return total
 
-def make_cnn_data(revs, word_idx_map, max_l=50, filter_h=3, val_test_splits=[2,3]):
+def make_data(revs, word_idx_map, max_l=50, filter_h=3
+                  ,train_instance = 500000,val_instance = 50000):
     """
     Transforms sentences into a 2-d matrix.
     """
     train, val, test = [], [], []
-    val_split, test_split = val_test_splits
     for rev in revs:
         sent = get_idx_from_sent(rev["m"], word_idx_map, max_l, filter_h)
         sent += get_idx_from_sent(rev["r"], word_idx_map, max_l, filter_h)
@@ -482,16 +471,14 @@ def make_cnn_data(revs, word_idx_map, max_l=50, filter_h=3, val_test_splits=[2,3
         sent.append(int(rev["t"]))
         sent.append(int(rev["t2"]))
 
-        if len(val) > 50000:
+        if len(train) < train_instance:
             train.append(sent)
-        else:
+        elif (len(train) + len(val)) < train_instance + val_instance:
             val.append(sent)
+        else:
+            test.append(sent)
 
-        if len(train) > 1200000:
-            break
-
-    if len(train) == 0:
-        train = val
+    shuffle(train)
     train = np.array(train,dtype="int")
     val = np.array(val,dtype="int")
     test = np.array(test,dtype="int")
@@ -516,13 +503,12 @@ def createtopicvec(word_idx_map):
 
 
 if __name__=="__main__":
-    dataset = r"data\raw_data4.bin"
+    dataset = r"D:\users\wuyu\pythoncode\TheanoPairMatching\data\raw_data3.bin"
     x = cPickle.load(open(dataset,"rb"))
     revs, wordvecs, max_l,tw = x[0], x[1], x[2], x[3]
-    # datasets = make_cnn_data(revs,wordvecs.word_idx_map,max_l=20)
-    # tm = createtopicvec(wordvecs.word_idx_map)
-    #x = cPickle.load(open(r"data\testdata.bin","rb"))
-    #revs, wordvecs2, max_l2 = x[0], x[1], x[2]
-    datasets = make_cnn_data(revs,wordvecs.word_idx_map,max_l=20)
-    train_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200)
-    predict_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200)
+
+    datasets = make_data(revs,wordvecs.word_idx_map,max_l=20)
+    train_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200
+              ,train_instance = 1000000,val_instance = 500000)
+    predict_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200
+                ,train_instance = 1000000,val_instance = 500000)
