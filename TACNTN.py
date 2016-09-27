@@ -240,7 +240,7 @@ def train_cnn(datasets,
             best_dev = cost
             save_params(params,'model\\TiebaFinal.bin')
         print  "echo %d dev_loss %f" % (i,cost)
-        print  "echo %d dev_loss %f" % (i,errors)
+        print  "echo %d dev_acc %f" % (i,1 - errors)
 
 
 def predict_cnn(datasets,
@@ -436,7 +436,7 @@ def predict_cnn(datasets,
     if cost < best_dev:
         best_dev = cost
     print  "echo %d dev_loss %f" % (0,cost)
-    print  "echo %d dev_loss %f" % (0,errors)
+    print  "echo %d dev_acc %f" % (0,1 - errors)
 
 def load_params(params,filename):
     f = open(filename)
@@ -459,7 +459,7 @@ def ComputeSame(m,r):
     return total
 
 def make_data(revs, word_idx_map, max_l=50, filter_h=3
-                  ,train_instance = 500000,val_instance = 50000):
+                  ,train_instance = 950000,val_instance = 50000):
     """
     Transforms sentences into a 2-d matrix.
     """
@@ -503,12 +503,10 @@ def createtopicvec(word_idx_map):
 
 
 if __name__=="__main__":
-    dataset = r"D:\users\wuyu\pythoncode\TheanoPairMatching\data\raw_data3.bin"
+    dataset = r"D:\users\wuyu\pythoncode\TheanoPairMatching\data\ubuntu_data.train"
     x = cPickle.load(open(dataset,"rb"))
     revs, wordvecs, max_l,tw = x[0], x[1], x[2], x[3]
 
-    datasets = make_data(revs,wordvecs.word_idx_map,max_l=20)
-    train_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200
-              ,train_instance = 1000000,val_instance = 500000)
-    predict_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200
-                ,train_instance = 1000000,val_instance = 500000)
+    datasets = make_data(revs,wordvecs.word_idx_map,max_l=50)
+    train_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200)
+    predict_cnn(datasets,wordvecs.W,tw,filter_hs=[3],hidden_units=[50],batch_size=200)
