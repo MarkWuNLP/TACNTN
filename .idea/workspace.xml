@@ -33,14 +33,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TACNTN.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TACNTN.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TACNTN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7147708">
-              <caret line="407" column="24" selection-start-line="407" selection-start-column="24" selection-end-line="407" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="506" column="29" selection-start-line="506" selection-start-column="29" selection-end-line="506" selection-end-column="29" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Classifier.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Classifier.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.46689305">
+              <caret line="158" column="27" selection-start-line="158" selection-start-column="27" selection-end-line="158" selection-end-column="27" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -77,10 +87,10 @@
       <list>
         <option value="$PROJECT_DIR$/CNN.py" />
         <option value="$PROJECT_DIR$/RNN.py" />
-        <option value="$PROJECT_DIR$/Classifier.py" />
         <option value="$PROJECT_DIR$/Arc1WithTopic_Ubuntu.py" />
         <option value="$PROJECT_DIR$/process_ubuntu.py" />
         <option value="$PROJECT_DIR$/TACNTN.py" />
+        <option value="$PROJECT_DIR$/Classifier.py" />
       </list>
     </option>
   </component>
@@ -375,11 +385,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/TACNTN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7147708">
-          <caret line="407" column="24" selection-start-line="407" selection-start-column="24" selection-end-line="407" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="506" column="29" selection-start-line="506" selection-start-column="29" selection-end-line="506" selection-end-column="29" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.46689305">
+          <caret line="158" column="27" selection-start-line="158" selection-start-column="27" selection-end-line="158" selection-end-column="27" />
+          <folding />
         </state>
       </provider>
     </entry>

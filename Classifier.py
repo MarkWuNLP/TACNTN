@@ -157,7 +157,7 @@ class TensorClassifier(object):
                 ),
                 dtype=theano.config.floatX
             ), borrow=True)
-        self.params = [self.W]
+        self.params = [self.W,self.W2]
 
     def __call__(self,left,right,batch_size, *args, **kwargs):
         tmp1 = T.dot(T.concatenate([left,right],1),self.W2)
